@@ -21,7 +21,6 @@ textBox.printSymbolCooldown = 0.1
 selectedChoiceIndex = 1
 isShowingChoices = false
 
-local pixelFont = love.graphics.newFont("Pixellari.ttf", 40)
 
 function updateTextBox(dt)
     if dotSwitchCooldown > 0 then

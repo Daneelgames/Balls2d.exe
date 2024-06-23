@@ -4,6 +4,7 @@ reaperMobSprite = love.graphics.newImage('sprites/reaper.png')
 textFont = love.graphics.newFont(30)
 landingFont = love.graphics.newFont(16)
 outlineFont = love.graphics.newFont(35)
+pixelFont = love.graphics.newFont("Pixellari.ttf", 40)
 
 damageEffects = {}
 
@@ -38,7 +39,7 @@ function renderGame()
             end
 
             if spawnedPowerUp then
-                love.graphics.setFont(outlineFont)
+                love.graphics.setFont(pixelFont)
                 love.graphics.print("?", spawnedPowerUp.x - 8, spawnedPowerUp.y - 8)
             end
 
@@ -65,16 +66,16 @@ function renderGame()
             for i, asteroid in ipairs(targetedAsteroids) do
                 love.graphics.circle('line', asteroid.x , asteroid.y, asteroidStages[asteroid.stage].radius*1.2)
             end
-            love.graphics.print(love.timer.getFPS(), 800, 50)
-            love.graphics.print(math.ceil(gameTimer * 100) / 100, 5, 20)
+            -- FPS
+            --love.graphics.print(love.timer.getFPS(), 800, 50)
                         
-            love.graphics.setColor(0, 0, 0)
-            love.graphics.setFont(outlineFont)
-            love.graphics.print("$"..gold, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.1)
-            
             love.graphics.setColor(1, 1, 0)
-            love.graphics.setFont(textFont)
+            love.graphics.setFont(pixelFont)
             love.graphics.print("$"..gold, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.1)
+
+            -- love.graphics.setColor(1, 1, 0)
+            -- love.graphics.setFont(textFont)
+            love.graphics.print(math.ceil(gameTimer * 100) / 100, 5, 20)
 
             if touchmove and targetX and targetY then
                 love.graphics.setColor(1, 1, 1)

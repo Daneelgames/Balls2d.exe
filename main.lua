@@ -289,9 +289,15 @@ function love.update(dt)
 
     -- REAPER MOB
     if reaperMob then
+        
         local dx, dy = directionTo(shipX, shipY, reaperMob.x, reaperMob.y)
-        reaperMob.x = reaperMob.x + dx * reaperMob.speed * dt
-        reaperMob.y = reaperMob.y + dy * reaperMob.speed * dt
+        if gameTimer > 200 then
+            reaperMob.x = reaperMob.x + dx * reaperMob.speed * 2 * dt
+            reaperMob.y = reaperMob.y + dy * reaperMob.speed * 2 * dt
+        else
+            reaperMob.x = reaperMob.x + dx * reaperMob.speed * dt
+            reaperMob.y = reaperMob.y + dy * reaperMob.speed * dt
+        end
         
         if areCirclesIntersecting(reaperMob.x, reaperMob.y, 32, shipX, shipY, shipRadius) then
             damagePlayer()
@@ -394,7 +400,7 @@ function love.update(dt)
         end
         
         --  PLAYER CRASHED INTO ASTEROID, BREAK
-        if areCirclesIntersecting(shipX, shipY, shipRadius,asteroid.x, asteroid.y, asteroidStages[asteroid.stage].radius) then
+        if areCirclesIntersecting(shipX, shipY, 2, asteroid.x, asteroid.y, asteroidStages[asteroid.stage].radius) then
             -- DONT DAMAGE IF ASTEROID IS TARGETED
             -- local isTargeted = false
             -- for t, targeted in ipairs(targetedAsteroids) do
