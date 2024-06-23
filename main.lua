@@ -30,6 +30,7 @@ landingTime = 3
 landingTimeCurrent = 0
 playerIsLandedOnPlanet = false
 reaperMob = nil
+vignette = nil
 
 local asteroidSpawnCooldown = 5
 local asteroidSpawnCooldownCurrent = asteroidSpawnCooldown
@@ -107,7 +108,6 @@ function love.load()
 
     reset()
     fillPowerupCutscenes()
-    spawnReaper()
 end
 
 function love.update(dt)
@@ -130,6 +130,10 @@ function love.update(dt)
     gameTimer = gameTimer + dt
     if reaperMob == nil and gameTimer > 100 then
         spawnReaper()
+    end
+
+    if vignette == nil and gameTimer > .1 then
+        vignette = true
     end
     if spawnedPowerUp == nil then
         powerupsSpawnCooldownCurrent = powerupsSpawnCooldownCurrent - dt
@@ -458,6 +462,8 @@ function reset()
     shipSpeedX = love.math.random(-1, 1) * 50
     shipSpeedY = love.math.random(-1, 1) * 50
 
+    vignette = nil
+
     playerLevel = 1
     playerGuns = {}
     reaperMob = nil
@@ -730,11 +736,11 @@ end
 
 
 function playerRepairedOnPlanet()
-    repairsInMinute = repairsInMinute + 1
+    -- repairsInMinute = repairsInMinute + 1
     -- print("playerRepairedOnPlanet " .. repairsInMinute .. "; time " .. repairsInMinuteCooldown)
-    if repairsInMinute > 3 then
-        spawnReaper()
-    end
+    -- if repairsInMinute > 3 then
+    --     spawnReaper()
+    -- end
 end
 
 function spawnReaper() 

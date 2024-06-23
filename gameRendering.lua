@@ -1,4 +1,4 @@
-
+vignetteSprite = love.graphics.newImage('sprites/vignette.png')
 reaperMobSprite = love.graphics.newImage('sprites/reaper.png')
 
 textFont = love.graphics.newFont(30)
@@ -47,7 +47,7 @@ function renderGame()
             if reaperMob then
                 love.graphics.draw(reaperMobSprite, reaperMob.x - 64 + love.math.random(-2,2), reaperMob.y - 64 + love.math.random(-2,2))
             end
-            
+
             for asteroidIndex, asteroid in ipairs(asteroids) do
                 love.graphics.setColor(0.5, 0, 0) 
                 love.graphics.circle('fill', asteroid.x, asteroid.y,asteroidStages[asteroid.stage].radius)
@@ -65,7 +65,7 @@ function renderGame()
             for i, asteroid in ipairs(targetedAsteroids) do
                 love.graphics.circle('line', asteroid.x , asteroid.y, asteroidStages[asteroid.stage].radius*1.2)
             end
-            -- love.graphics.print(love.timer.getFPS(), 5, 50)
+            love.graphics.print(love.timer.getFPS(), 800, 50)
             love.graphics.print(math.ceil(gameTimer * 100) / 100, 5, 20)
                         
             love.graphics.setColor(0, 0, 0)
@@ -100,12 +100,19 @@ function renderGame()
             love.graphics.print(playerHpCurrent, shipX - shipRadius/2, shipY - shipRadius)
 
             drawDamageEffects()
+            
+            if vignette then
+                vignetteShaderStart()
+                drawVignette()
+            end
 
+            textShaderStart()
             drawTextBox()
         end
     end
     textShaderEnd()
 end
+
 
 function updateEffects(dt)
     for i = #damageEffects, 1, -1 do

@@ -43,29 +43,74 @@ textShader:send("samples", 5)
 textShader:send("quality", 10.0)
 textShader:send("intensity", 1.0)
 textShader:send("scale", 0.1)
-textShader:send("imageSize" , {1280, 720})
 
 
 local backgroundShader = love.graphics.newShader[[
 
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    uniform vec2 u_resolution;
+
+    extern float intensity;
+    extern float scale;
+    extern float phase;
+
+    float rand(vec2 co) {
+        return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+
+    vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
+    {
+        vec2 st = (2. * screen_coords-  u_resolution.xy) / u_resolution.y;
+        float radius = length(st * 50.);
+        float rings = smoothstep(.1, .25, sin(phase + radius)) * .45;
+        return vec4(rings, 0, 0, 1.);
+    }
+        
+    vec4 position(mat4 transform_projection, vec4 vertex_position) {
+        vertex_position.x = vertex_position.x + sin(vertex_position.y * u_resolution.y * (scale / u_resolution.x) + phase) * intensity;
+        vertex_position.y = vertex_position.y + sin(vertex_position.x * u_resolution.x * (scale / u_resolution.y) + phase) * intensity;
+        return transform_projection * vertex_position;
+    }
+
+]]
+
+backgroundShader:send("phase", 0.0)
+backgroundShader:send("intensity", 5.0)
+backgroundShader:send("scale", 2)
+
+
+local vignetteShader = love.graphics.newShader[[
+
+    uniform float alpha = 1.0;
+    uniform float inner_radius = 0.0;
+    uniform float outer_radius = 1.0;
+
     vec4 effect(vec4 colour, Image tex, vec2 tc, vec2 sc)
     {
-        colour.r = 0.0;
-        colour.g = 0.0;
-        colour.b = 0.0;
-        colour.a = 1.0;
+        float x = abs(colour.r-.5)*2.0;
+        float y = abs(colour.g-.5)*2.0;
+        float q = 1.0-(1.0-sqrt(x*x+y*y)/outer_radius)/(1.0-inner_radius);
+        
+        colour = vec4(0, 0, 0, q*alpha);
         return colour;
     }
 ]]
 
-
-
 tt = 0
+ttt = 0
 function updateShader(dt)
+    backgroundShader:send("u_resolution", {love.graphics.getWidth(), love.graphics.getHeight()})
     t = love.math.random(0.1,2.0)
     textShader:send("t", t)
     tt = tt + 40 * dt
+    ttt = ttt + 5 * dt
     textShader:send("phase", tt)
+    backgroundShader:send("phase", ttt)
+    textShader:send("imageSize" , {love.graphics.getWidth(), love.graphics.getHeight()})
+
 end
 
 function textShaderStart()
@@ -82,4 +127,8 @@ end
 
 function backgroundShaderEnd()
     love.graphics.setShader()
+end
+
+function vignetteShaderStart()
+    love.graphics.setShader(vignetteShader)
 end

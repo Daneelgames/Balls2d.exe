@@ -6,11 +6,14 @@ function drawBackground()
 	
 end
 
-function updateBackground(dt)
+function drawVignette()
+	-- love.graphics.setColor(.0, .0, .0)
+	-- love.graphics.rectangle("fill",-50, -50,arenaWidth + 100, arenaHeight + 100)
+	
 end
 
-
-
+function updateBackground(dt)
+end
 
 
 
