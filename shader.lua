@@ -96,7 +96,8 @@ local vignetteShader = love.graphics.newShader[[
 
     uniform vec2 res;
     uniform vec2 ship;
- 
+	uniform float radius;
+
     vec4 effect(vec4 colour, Image tex, vec2 tc, vec2 sc)
     {
         return vec4(0,0,0,1-(
@@ -104,26 +105,26 @@ local vignetteShader = love.graphics.newShader[[
             max(
                 max(
                     max(
-                        (1-distance(sc, ship)/res*2),
-                        (1-distance(sc, vec2(ship.x+res.x,ship.y))/res*2)
+                        (1-distance(sc, ship)/res*radius),
+                        (1-distance(sc, vec2(ship.x+res.x,ship.y))/res*radius)
                     ),
                     max(
-                        (1-distance(sc, vec2(ship.x-res.x,ship.y))/res*2),
-                        (1-distance(sc, vec2(ship.x,ship.y+res.y))/res*2)
+                        (1-distance(sc, vec2(ship.x-res.x,ship.y))/res*radius),
+                        (1-distance(sc, vec2(ship.x,ship.y+res.y))/res*radius)
                     )
                 ),
                 max(
                     max(
-                        (1-distance(sc, vec2(ship.x,ship.y-res.y))/res*2),
-                        (1-distance(sc, ship+res)/res*2)
+                        (1-distance(sc, vec2(ship.x,ship.y-res.y))/res*radius),
+                        (1-distance(sc, ship+res)/res*radius)
                     ),
                     max(
-                        (1-distance(sc, ship-res)/res*2),
-                        (1-distance(sc, vec2(ship.x+res.x,ship.y-res.y))/res*2)
+                        (1-distance(sc, ship-res)/res*radius),
+                        (1-distance(sc, vec2(ship.x+res.x,ship.y-res.y))/res*radius)
                     )
                 )
             ),
-            (1-distance(sc, vec2(ship.x-res.x,ship.y+res.y))/res*2)
+            (1-distance(sc, vec2(ship.x-res.x,ship.y+res.y))/res*radius)
         )
         ));
     }
