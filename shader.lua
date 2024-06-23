@@ -46,6 +46,20 @@ textShader:send("scale", 0.1)
 textShader:send("imageSize" , {1280, 720})
 
 
+local backgroundShader = love.graphics.newShader[[
+
+    vec4 effect(vec4 colour, Image tex, vec2 tc, vec2 sc)
+    {
+        colour.r = 0.0;
+        colour.g = 0.0;
+        colour.b = 0.0;
+        colour.a = 1.0;
+        return colour;
+    }
+]]
+
+
+
 tt = 0
 function updateShader(dt)
     t = love.math.random(0.1,2.0)
@@ -59,5 +73,13 @@ function textShaderStart()
 end
 
 function textShaderEnd()
+    love.graphics.setShader()
+end
+
+function backgroundShaderStart()
+    love.graphics.setShader(backgroundShader)
+end
+
+function backgroundShaderEnd()
     love.graphics.setShader()
 end

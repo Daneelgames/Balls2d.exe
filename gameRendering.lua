@@ -8,8 +8,9 @@ outlineFont = love.graphics.newFont(35)
 damageEffects = {}
 
 function renderGame()
-    textShaderStart()
+    backgroundShaderStart()
     drawBackground()
+    textShaderStart()
 
     for y = -1, 1 do
         for x = -1, 1 do
