@@ -54,6 +54,7 @@ local backgroundShader = love.graphics.newShader[[
 
     extern int stage;
     uniform vec2 u_resolution;
+    uniform vec2 ship;
 
     extern float intensity;
     extern float scale;
@@ -65,10 +66,10 @@ local backgroundShader = love.graphics.newShader[[
 
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords) 
     {
-        vec2 st = (2. * screen_coords-  u_resolution.xy) / u_resolution.y;
+        vec2 st = (2. * screen_coords - ship*2) / u_resolution.y;
         float radius = length(st * 50.);
         //float rings = smoothstep(.1, .25, sin(phase + radius)) * .45;
-        float rings = smoothstep(.1, .25, sin(phase + radius)) * .3;
+        float rings = max(smoothstep(.1, .25, sin(phase + radius)) * .3, .05);
        
         if (stage==1)
             return vec4(0, 0, rings, 1.);
@@ -157,6 +158,7 @@ function updateShader(dt)
     local w = love.graphics.getWidth()
     local h = love.graphics.getHeight()
     backgroundShader:send("u_resolution", {w, h})
+	backgroundShader:send("ship", {shipX, shipY})
     vignetteShader:send("res", {w, h})
 	vignetteShader:send("ship", {shipX, shipY})
     t = love.math.random(0.1,2.0)
