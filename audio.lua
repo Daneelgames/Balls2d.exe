@@ -11,6 +11,11 @@ sounds.defaultAmbient = love.audio.newSource("audio/Soul Food - Chris Haugen.mp3
 sounds.defaultAmbient:setVolume(0.5)
 sounds.defaultAmbient:setLooping(true)
 
+sounds.reaperAmbient = love.audio.newSource("audio/breathingAmbientMonsterMusic.wav", "stream")
+sounds.reaperAmbient:setVolume(1)
+sounds.reaperAmbient:setLooping(true)
+
+
 sounds.textDungeonAmbient = love.audio.newSource("audio/ambient.mp3", "stream")
 sounds.textDungeonAmbient:setVolume(0.5)
 sounds.textDungeonAmbient:setLooping(true)
@@ -95,4 +100,19 @@ function playMusic(music)
     currentMusicAu:stop()
     currentMusicAu = music
     currentMusicAu:play()
+end
+
+function resetSounds()
+    playMusic(sounds.defaultAmbient)
+    sounds.reaperAmbient:stop()
+end
+
+function startReaperSound()
+    sounds.reaperAmbient:setVolume(0)
+    sounds.reaperAmbient:play()
+end
+
+function setReaperSoundDistance(distance)
+    
+    sounds.reaperAmbient:setVolume(clamp(1 - (distance/getWidth), 0.01, 1))
 end

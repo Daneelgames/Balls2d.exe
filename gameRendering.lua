@@ -1,4 +1,5 @@
 
+reaperMobSprite = love.graphics.newImage('sprites/reaper.png')
 
 textFont = love.graphics.newFont(30)
 landingFont = love.graphics.newFont(16)
@@ -52,6 +53,14 @@ function renderGame()
             love.graphics.setColor(1, 1, 1)
             for bulletIndex, bullet in ipairs(bullets) do
                 love.graphics.circle('fill', bullet.x, bullet.y, bulletRadius)
+            end
+
+            if reaperMob then
+                if reaperMob.x < shipX then
+                    love.graphics.draw(reaperMobSprite, reaperMob.x - 16, reaperMob.y - 16)
+                else
+                    love.graphics.draw(reaperMobSprite, reaperMob.x - -8, reaperMob.y- 16,  nil, -1, 1)
+                end
             end
 
             love.graphics.setColor(1, 0, 0)

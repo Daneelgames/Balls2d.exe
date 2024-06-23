@@ -106,6 +106,9 @@ function playCutsceneDirect(cutscene)
         elseif currentPlayingCutscene.showScore then
             resultPhrase = resultPhrase .. ". Time survived:" .. math.ceil(gameTimer * 100) / 100 .. ". Ship Level: " .. playerLevel .. ". Planets level: " .. planetsLevel
             reset()
+        elseif currentPlayingCutscene.improveManuverability then
+            shipSpeedClampScaler = clamp(shipSpeedClampScaler - 0.3, 1, shipSpeedClampScalerDefault)
+            playerLevel = playerLevel + 1
         elseif currentPlayingCutscene.improveMovementSpeed then
             shipSpeed = shipSpeed + shipSpeed * 0.25
             playerLevel = playerLevel + 1
@@ -148,12 +151,14 @@ function playCutsceneDirect(cutscene)
             resultPhrase = "Ship Level : " .. playerLevel .. ". ".. phrase.text
             upgradePlayerShip()
         elseif currentPlayingCutscene.repairPlayerShip then
+
             playerLandingOnPlanet.level = playerLandingOnPlanet.level + 1
             if playerHpCurrent >= playerHp + playerLevel then
                 playerHpCurrent = playerHpCurrent + 1
             else
                 playerHpCurrent = playerHp + playerLevel
             end
+            playerRepairedOnPlanet()
         elseif currentPlayingCutscene.repairSingle then
             playerHpCurrent = playerHpCurrent + 1
         elseif currentPlayingCutscene.takeOff then
@@ -207,7 +212,7 @@ function drawTextBox()
     end
     love.graphics.setColor(textBox.colorR, textBox.colorG, textBox.colorB, 1)
 
-    love.graphics.printf(resultText, textBox.x, textBox.y, love.graphics.getWidth()-10, 'center')
+    love.graphics.printf(resultText, textBox.x, textBox.y, love.graphics.getWidth()-30, 'center')
 
     love.graphics.setColor(1,1,1)
 

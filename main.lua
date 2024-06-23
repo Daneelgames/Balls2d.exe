@@ -21,18 +21,24 @@ playerDamageCooldown = 1
 playerDamageCooldownCurrent = playerDamageCooldown
 
 planetPricesScaler = 1
-shipSpeedDefault = 20
+shipSpeedDefault = 40
+shipSpeedClampScalerDefault = 5
+shipSpeedClampScaler = shipSpeedClampScalerDefault
 shipSpeed = shipSpeedDefault
 
 landingTime = 3
 landingTimeCurrent = 0
 playerIsLandedOnPlanet = false
+reaperMob = nil
 
 local asteroidSpawnCooldown = 5
 local asteroidSpawnCooldownCurrent = asteroidSpawnCooldown
 
 local powerupsSpawnCooldown = 1
 local powerupsSpawnCooldownCurrent = powerupsSpawnCooldown
+
+local repairsInMinute = 0
+local repairsInMinuteCooldown = 0
 
 asteroids = {}
 function onResize(w,h)
@@ -113,6 +119,12 @@ function love.update(dt)
         updateTextBox(dt)
         return
     end
+    if repairsInMinuteCooldown < 60 then
+        repairsInMinuteCooldown = repairsInMinuteCooldown + dt
+    else
+        repairsInMinute = 0
+        repairsInMinuteCooldown = 0
+    end
 
     gameTimer = gameTimer + dt
 
@@ -161,6 +173,7 @@ function love.update(dt)
         end 
     end
 
+    -- PLAYER MOVEMENT SPEED CHANGE
     if touchmove then
         angle = math.atan2(targetY -shipY , targetX- shipX )
         cos = math.cos(angle)
@@ -171,8 +184,8 @@ function love.update(dt)
         local distance = distance(shipX, shipY, targetX, targetY)
         local resultShipSpeed = shipSpeed * (distance / (shipRadius * 5))
 
-        shipSpeedX = shipSpeedX + math.cos(shipAngle) * resultShipSpeed * dt
-        shipSpeedY = shipSpeedY + math.sin(shipAngle) * resultShipSpeed * dt
+        shipSpeedX = clamp(shipSpeedX + math.cos(shipAngle) * resultShipSpeed * dt, -shipSpeed * shipSpeedClampScaler, shipSpeed * shipSpeedClampScaler)
+        shipSpeedY = clamp(shipSpeedY + math.sin(shipAngle) * resultShipSpeed * dt, -shipSpeed * shipSpeedClampScaler, shipSpeed * shipSpeedClampScaler)
     end
 
     -- PLANETS
@@ -243,7 +256,8 @@ function love.update(dt)
             landingTimeCurrent = 0
             playCutscene("landedOnPlanetCutscene")
         end
-        
+
+        -- PLAYER MOVEMENT LAND ON PLANET MAGNIT
         local dx, dy = directionTo(playerLandingOnPlanet.x, playerLandingOnPlanet.y, shipX, shipY)
         if shipSpeedX > shipSpeed * 0.1 then 
             shipSpeedX = shipSpeedX - shipSpeed * dt * 10
@@ -256,17 +270,28 @@ function love.update(dt)
             shipSpeedY = shipSpeedY + shipSpeed * dt * 10
         end
 
-        -- shipX = (shipX + shipSpeedX * dt + dx * shipSpeed * dt) % arenaWidth
-        -- shipY = (shipY + shipSpeedX * dt + dy * shipSpeed * dt) % arenaHeight
         shipX = (shipX + dx * shipSpeed * dt) % arenaWidth
         shipY = (shipY  + dy * shipSpeed * dt) % arenaHeight
     else
+        -- PLAYER MOVEMENT
         landingTimeCurrent = 0
 
         shipX = (shipX + shipSpeedX * dt) % arenaWidth
         shipY = (shipY + shipSpeedY * dt) % arenaHeight
     end
 
+    -- REAPER MOB
+    if reaperMob then
+        local dx, dy = directionTo(shipX, shipY, reaperMob.x, reaperMob.y)
+        reaperMob.x = reaperMob.x + dx * reaperMob.speed * dt
+        reaperMob.y = reaperMob.y + dy * reaperMob.speed * dt
+        
+        if areCirclesIntersecting(reaperMob.x, reaperMob.y, 32, shipX, shipY, shipRadius) then
+            damagePlayer()
+        end
+
+        setReaperSoundDistance(distance(reaperMob.x, reaperMob.y, shipX, shipY))
+    end
 
 
     for bulletIndex = #bullets, 1, -1 do
@@ -432,7 +457,7 @@ function reset()
 
     playerLevel = 1
     playerGuns = {}
-    
+    reaperMob = nil
     -- STARTING GUN
     local startGun = {}
     startGun.bulletLifeTime = 2
@@ -442,13 +467,15 @@ function reset()
     startGun.damage = 1
     table.insert(playerGuns, startGun)
     powerupsSpawnCooldownCurrent = 0
-    gold = 0
+    gold = 500
     pickups = {}
     bullets = {}
     bulletTimer = bulletTimerLimit
     grabDistance = 128
     planetPricesScaler = 1
-    
+    shiSpeedClampScaler = shipSpeedClampScalerDefault
+    repairsInMinute = 0
+    reaperMob = nil
     shipSpeed = shipSpeedDefault
     playerHp = 5
     playerHpCurrent = playerHp
@@ -459,7 +486,7 @@ function reset()
     spawnNewAsteroid()
     spawnNewAsteroid()
     spawnNewAsteroid()
-    
+    resetSounds()
 
     planets = {
         {
@@ -495,7 +522,7 @@ function reset()
 end
 
 function spawnNewAsteroid(_x, _y, angle, stage)
-    if #asteroids > clamp(gameTimer, 6, 500) then
+    if #asteroids > clamp(gameTimer, 10, 200) then
         return
     end
     local x = 0
@@ -695,5 +722,31 @@ function getRandomPowerUp()
 
     if #currentPowerUpCutscenesList < 1 then
         fillPowerupCutscenes()
+    end
+end
+
+
+function playerRepairedOnPlanet()
+    repairsInMinute = repairsInMinute + 1
+    print("playerRepairedOnPlanet " .. repairsInMinute .. "; time " .. repairsInMinuteCooldown)
+    if repairsInMinute > 3 then
+        spawnReaper()
+    end
+end
+
+function spawnReaper() 
+    if reaperMob == nil then
+        reaperMob = {}
+        if shipX < arenaWidth/2 then
+            reaperMob.x = love.math.random(arenaWidth * 0.6, arenaWidth * 0.8)
+        else
+            reaperMob.x = love.math.random(arenaWidth * 0.2, arenaWidth * 0.4)
+        end
+        if shipY < arenaHeight/2 then
+            reaperMob.y = love.math.random(arenaHeight * 0.6, arenaHeight * 0.8)
+        else
+            reaperMob.y = love.math.random(arenaHeight * 0.2, arenaHeight * 0.4)
+        end
+        reaperMob.speed = 20
     end
 end

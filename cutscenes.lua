@@ -101,7 +101,7 @@ cutscenes["notEnoughMoneyCutscene"] = notEnoughMoneyCutscene
 
 
 repairCutscene = {}
-repairCutscene.baseCost = 10
+repairCutscene.baseCost = 25
 repairCutscene.repairPlayerShip = true
 newGamePhrase("ship repaired", repairCutscene)
 newPlayerChoice("upgrade ship", repairCutscene, "upgradeShipCutscene")
@@ -138,20 +138,20 @@ cutscenes["takeOffCutscene"] = takeOffCutscene
 powerUpFoundCutscene1 = {}
 newGamePhrase("you found antient tech", powerUpFoundCutscene1)
 newPlayerChoice("improve attack", powerUpFoundCutscene1, nil, {"improveDamageCutscene","improveBulletSpeedCutscene","improveBulletLifetimeCutscene"}) -- отсюда с шансом включение другой катсцены 
-newPlayerChoice("improve systems", powerUpFoundCutscene1, nil, {"improveHpCutscene","improveGrabRangeCutscene","improvePlanetPricesCutscene"}) -- отсюда с шансом включение другой катсцены 
+newPlayerChoice("improve systems", powerUpFoundCutscene1, nil, {"improveHpCutscene","improveGrabRangeCutscene","improvePlanetPricesCutscene", "improveManeuverabilityCutscene"}) -- отсюда с шансом включение другой катсцены 
 cutscenes["powerUpFoundCutscene1"] = powerUpFoundCutscene1
 table.insert(powerUpCutscenes, "powerUpFoundCutscene1")
 
 powerUpFoundCutscene2 = {}
 newGamePhrase("you found some balls", powerUpFoundCutscene2)
-newPlayerChoice("balls", powerUpFoundCutscene2, nil, {"improveDamageCutscene","improveBulletSpeedCutscene","improveBulletLifetimeCutscene", "improveHpCutscene","improveGrabRangeCutscene","improvePlanetPricesCutscene"}) -- отсюда с шансом включение другой катсцены 
+newPlayerChoice("balls", powerUpFoundCutscene2, nil, {"improveDamageCutscene","improveBulletSpeedCutscene","improveBulletLifetimeCutscene", "improveHpCutscene","improveGrabRangeCutscene", "improveManeuverabilityCutscene","improvePlanetPricesCutscene"}) -- отсюда с шансом включение другой катсцены 
 cutscenes["powerUpFoundCutscene2"] = powerUpFoundCutscene2
 table.insert(powerUpCutscenes, "powerUpFoundCutscene2")
 
 powerUpFoundCutscene3 = {}
 newGamePhrase("you found an old dying ball", powerUpFoundCutscene3)
 newGamePhrase("he's last will is to teach you something", powerUpFoundCutscene3)
-newPlayerChoice("improve movement", powerUpFoundCutscene3, "improveMovementSpeedCutscene")
+newPlayerChoice("improve movement", powerUpFoundCutscene3, nil, {"improveMovementSpeedCutscene", "improveManeuverabilityCutscene"})
 newPlayerChoice("improve planets guns damage", powerUpFoundCutscene3, "improvePlanetsGunsDamageCutscene")
 newPlayerChoice("repair haul", powerUpFoundCutscene3, "repairSingleCutscene")
 cutscenes["powerUpFoundCutscene3"] = powerUpFoundCutscene3
@@ -173,6 +173,11 @@ improveMovementSpeedCutscene = {}
 newGamePhrase("movement speed improved", improveMovementSpeedCutscene)
 improveMovementSpeedCutscene.improveMovementSpeed = true
 cutscenes["improveMovementSpeedCutscene"] = improveMovementSpeedCutscene
+
+improveManeuverabilityCutscene = {}
+newGamePhrase("maneuverability improved", improveManeuverabilityCutscene)
+improveMovementSpeedCutscene.improveManuverability = true
+cutscenes["improveManeuverabilityCutscene"] = improveManeuverabilityCutscene
 
 
 improveDamageCutscene = {}
