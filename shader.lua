@@ -71,9 +71,9 @@ local backgroundShader = love.graphics.newShader[[
         if (stage==1)
             return vec4(0, 0, rings, 1.);
         else if (stage==2)
-            return vec4(0, 0, rings, 1.);
-        else
             return vec4(rings, 0, 0, 1.);
+        else
+            return vec4(rings, 0, 0.2, 1.);
     }
         
     vec4 position(mat4 transform_projection, vec4 vertex_position) {
@@ -95,32 +95,38 @@ local vignetteShader = love.graphics.newShader[[
     uniform float alpha = 1.0;
     uniform float inner_radius = 0.0;
     uniform float outer_radius = 1.0;
+    uniform vec2 u_resolution;
 
     vec4 effect(vec4 colour, Image tex, vec2 tc, vec2 sc)
     {
-        float x = abs(colour.r-.5)*2.0;
-        float y = abs(colour.g-.5)*2.0;
-        float q = 1.0-(1.0-sqrt(x*x+y*y)/outer_radius)/(1.0-inner_radius);
-        
-        colour = vec4(0, 0, 0, q*alpha);
-        return colour;
+        vec2 st = (2. * sc-  u_resolution.xy) / u_resolution.y;
+        vec2 uv = sc.xy / u_resolution.xy;
+        uv *=  1.0 - uv.yx;
+        float vig = uv.x*uv.y * 15.0;
+        vig = pow(vig, 0.25);
+
+        return vec4(0, 0, 0, 1-vig);
     }
 ]]
 
 tt = 0
 ttt = 0
 function updateShader(dt)
-    backgroundShader:send("u_resolution", {love.graphics.getWidth(), love.graphics.getHeight()})
+    local w = love.graphics.getWidth()
+    local h = love.graphics.getHeight()
+    backgroundShader:send("u_resolution", {w, h})
+    vignetteShader:send("u_resolution", {w, h})
     t = love.math.random(0.1,2.0)
     textShader:send("t", t)
     tt = tt + 40 * dt
     ttt = ttt + 5 * dt
     textShader:send("phase", tt)
     backgroundShader:send("phase", ttt)
-    textShader:send("imageSize" , {love.graphics.getWidth(), love.graphics.getHeight()})
+    textShader:send("imageSize" , {w, h})
     
 
     backgroundShader:send("stage", math.floor(clamp(gameTimer / 100, 1,3)))
+    -- backgroundShader:send("stage", 2)
 
 end
 
