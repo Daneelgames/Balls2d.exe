@@ -46,11 +46,11 @@ textShader:send("scale", 0.1)
 
 
 local backgroundShader = love.graphics.newShader[[
-
     #ifdef GL_ES
     precision mediump float;
     #endif
 
+    extern int stage;
     uniform vec2 u_resolution;
 
     extern float intensity;
@@ -65,8 +65,15 @@ local backgroundShader = love.graphics.newShader[[
     {
         vec2 st = (2. * screen_coords-  u_resolution.xy) / u_resolution.y;
         float radius = length(st * 50.);
-        float rings = smoothstep(.1, .25, sin(phase + radius)) * .45;
-        return vec4(rings, 0, 0, 1.);
+        //float rings = smoothstep(.1, .25, sin(phase + radius)) * .45;
+        float rings = smoothstep(.1, .25, sin(phase + radius)) * .3;
+       
+        if (stage==1)
+            return vec4(0, 0, rings, 1.);
+        else if (stage==2)
+            return vec4(0, 0, rings, 1.);
+        else
+            return vec4(rings, 0, 0, 1.);
     }
         
     vec4 position(mat4 transform_projection, vec4 vertex_position) {
@@ -77,6 +84,7 @@ local backgroundShader = love.graphics.newShader[[
 
 ]]
 
+backgroundShader:send("stage", 1)
 backgroundShader:send("phase", 0.0)
 backgroundShader:send("intensity", 5.0)
 backgroundShader:send("scale", 2)
@@ -110,6 +118,9 @@ function updateShader(dt)
     textShader:send("phase", tt)
     backgroundShader:send("phase", ttt)
     textShader:send("imageSize" , {love.graphics.getWidth(), love.graphics.getHeight()})
+    
+
+    backgroundShader:send("stage", math.floor(clamp(gameTimer / 100, 1,3)))
 
 end
 
