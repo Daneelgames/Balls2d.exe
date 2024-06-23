@@ -114,5 +114,8 @@ end
 
 function setReaperSoundDistance(distance)
     
-    sounds.reaperAmbient:setVolume(clamp(1 - (distance/getWidth), 0.01, 1))
+    local result = clamp(1 - (distance/love.graphics.getWidth()), 0.01, 1)
+    print(result)
+    sounds.reaperAmbient:setVolume(result)
+    currentMusicAu:setVolume(1-result)
 end

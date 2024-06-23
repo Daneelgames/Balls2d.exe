@@ -107,6 +107,7 @@ function love.load()
 
     reset()
     fillPowerupCutscenes()
+    spawnReaper()
 end
 
 function love.update(dt)
@@ -127,7 +128,9 @@ function love.update(dt)
     end
 
     gameTimer = gameTimer + dt
-
+    if reaperMob == nil and gameTimer > 100 then
+        spawnReaper()
+    end
     if spawnedPowerUp == nil then
         powerupsSpawnCooldownCurrent = powerupsSpawnCooldownCurrent - dt
         if powerupsSpawnCooldownCurrent < 0 then
@@ -467,7 +470,7 @@ function reset()
     startGun.damage = 1
     table.insert(playerGuns, startGun)
     powerupsSpawnCooldownCurrent = 0
-    gold = 500
+    gold = 0
     pickups = {}
     bullets = {}
     bulletTimer = bulletTimerLimit
@@ -522,7 +525,7 @@ function reset()
 end
 
 function spawnNewAsteroid(_x, _y, angle, stage)
-    if #asteroids > clamp(gameTimer, 10, 200) then
+    if #asteroids > clamp(gameTimer, 10, 300) then
         return
     end
     local x = 0
@@ -704,12 +707,12 @@ function fillPowerupCutscenes()
         local cutscene = powerUpCutscenes[i]
         table.insert(currentPowerUpCutscenesList, cutscene)
     end
-    print("fill ".. #currentPowerUpCutscenesList)
+    -- print("fill ".. #currentPowerUpCutscenesList)
 end
 
 function getRandomPowerUp()
     local ccc = currentPowerUpCutscenesList[math.random(1, #currentPowerUpCutscenesList)]
-    print("powerup " .. ccc)
+    -- print("powerup " .. ccc)
 
     local playingCutscene = playCutscene(ccc)
     
@@ -728,7 +731,7 @@ end
 
 function playerRepairedOnPlanet()
     repairsInMinute = repairsInMinute + 1
-    print("playerRepairedOnPlanet " .. repairsInMinute .. "; time " .. repairsInMinuteCooldown)
+    -- print("playerRepairedOnPlanet " .. repairsInMinute .. "; time " .. repairsInMinuteCooldown)
     if repairsInMinute > 3 then
         spawnReaper()
     end
@@ -736,6 +739,7 @@ end
 
 function spawnReaper() 
     if reaperMob == nil then
+        startReaperSound()
         reaperMob = {}
         if shipX < arenaWidth/2 then
             reaperMob.x = love.math.random(arenaWidth * 0.6, arenaWidth * 0.8)

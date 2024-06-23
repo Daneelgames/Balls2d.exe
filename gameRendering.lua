@@ -43,8 +43,13 @@ function renderGame()
             end
 
 
+
+            if reaperMob then
+                love.graphics.draw(reaperMobSprite, reaperMob.x - 64 + love.math.random(-2,2), reaperMob.y - 64 + love.math.random(-2,2))
+            end
+            
             for asteroidIndex, asteroid in ipairs(asteroids) do
-                love.graphics.setColor(0.5, 0, 0)
+                love.graphics.setColor(0.5, 0, 0) 
                 love.graphics.circle('fill', asteroid.x, asteroid.y,asteroidStages[asteroid.stage].radius)
                 love.graphics.setColor(0, 0, 0)
                 love.graphics.setFont(landingFont)
@@ -54,14 +59,6 @@ function renderGame()
             love.graphics.setColor(1, 1, 1)
             for bulletIndex, bullet in ipairs(bullets) do
                 love.graphics.circle('fill', bullet.x, bullet.y, bulletRadius)
-            end
-
-            if reaperMob then
-                if reaperMob.x < shipX then
-                    love.graphics.draw(reaperMobSprite, reaperMob.x - 16, reaperMob.y - 16)
-                else
-                    love.graphics.draw(reaperMobSprite, reaperMob.x - -8, reaperMob.y- 16,  nil, -1, 1)
-                end
             end
 
             love.graphics.setColor(1, 0, 0)
