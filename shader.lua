@@ -94,36 +94,71 @@ backgroundShader:send("scale", 2)
 
 local vignetteShader = love.graphics.newShader[[
 
-    uniform float alpha = 1.0;
-    uniform float inner_radius = 0.0;
-    uniform float outer_radius = 1.0;
-    uniform vec2 u_resolution;
+    uniform vec2 res;
+    uniform vec2 ship;
+	uniform float radius;
 
     vec4 effect(vec4 colour, Image tex, vec2 tc, vec2 sc)
     {
-        vec2 st = (2. * sc-  u_resolution.xy) / u_resolution.y;
-        vec2 uv = sc.xy / u_resolution.xy;
-        uv *=  1.0 - uv.yx;
-        float vig = uv.x*uv.y * 15.0;
-        vig = pow(vig, 0.25);
-
-        return vec4(0, 0, 0, 1-vig);
+        return vec4(0,0,0,1-(
+        max(
+            max(
+                max(
+                    max(
+                        (1-distance(sc, ship)/res*radius),
+                        (1-distance(sc, vec2(ship.x+res.x,ship.y))/res*radius)
+                    ),
+                    max(
+                        (1-distance(sc, vec2(ship.x-res.x,ship.y))/res*radius),
+                        (1-distance(sc, vec2(ship.x,ship.y+res.y))/res*radius)
+                    )
+                ),
+                max(
+                    max(
+                        (1-distance(sc, vec2(ship.x,ship.y-res.y))/res*radius),
+                        (1-distance(sc, ship+res)/res*radius)
+                    ),
+                    max(
+                        (1-distance(sc, ship-res)/res*radius),
+                        (1-distance(sc, vec2(ship.x+res.x,ship.y-res.y))/res*radius)
+                    )
+                )
+            ),
+            (1-distance(sc, vec2(ship.x-res.x,ship.y+res.y))/res*radius)
+        )
+        ));
     }
+
 ]]
 
 tt = 0
 ttt = 0
 function updateShader(dt)
-    if gameTimer < 100 then
+    if gameTimer < 50 then
         backgroundShader:send("stage", 1)
-    else
+        vignetteShader:send("radius", 0.2)
+    elseif gameTimer < 100 then
+        backgroundShader:send("stage", 1)
+        vignetteShader:send("radius", 0.5)
+    elseif gameTimer < 150 then
         backgroundShader:send("stage", 2)
+        vignetteShader:send("radius", 1)
+    elseif gameTimer < 250 then
+        backgroundShader:send("stage", 2)
+        vignetteShader:send("radius", 2)
+    elseif gameTimer < 300 then
+        backgroundShader:send("stage", 2)
+        vignetteShader:send("radius", 4)
+    else
+        backgroundShader:send("stage", 3)
+        vignetteShader:send("radius", 1)
     end
     
     local w = love.graphics.getWidth()
     local h = love.graphics.getHeight()
     backgroundShader:send("u_resolution", {w, h})
-    vignetteShader:send("u_resolution", {w, h})
+    vignetteShader:send("res", {w, h})
+	vignetteShader:send("ship", {shipX, shipY})
     t = love.math.random(0.1,2.0)
     textShader:send("t", t)
     tt = tt + 40 * dt
