@@ -1,8 +1,9 @@
+portraitSprite = love.graphics.newImage('sprites/Portrait.png')
 vignetteSprite = love.graphics.newImage('sprites/vignette.png')
 reaperMobSprite = love.graphics.newImage('sprites/reaper.png')
 
 textFont = love.graphics.newFont(30)
-landingFont = love.graphics.newFont(16)
+landingFont = love.graphics.newFont(20)
 outlineFont = love.graphics.newFont(35)
 pixelFont = love.graphics.newFont("Pixellari.ttf", 40)
 
@@ -18,53 +19,78 @@ function renderGame()
             love.graphics.origin()
             love.graphics.translate(x * arenaWidth, y * arenaHeight)
 
-            for i, planet in ipairs(planets) do
-                love.graphics.setColor(0, .05, .1)
-                love.graphics.circle('fill', planet.x, planet.y,planetStages[planet.stage].radius * 1.1)
-                love.graphics.setColor(0, .2, .3)
-                love.graphics.circle('fill', planet.x, planet.y,planetStages[planet.stage].radius)
-                love.graphics.setColor(0.0, .3, .5)
-                love.graphics.printf("LVL " .. planet.level, planet.x - planetStages[planet.stage].radius, planet.y, 128, 'center')
-            end
+            if isTextBoxVisible == false then
+                for i, planet in ipairs(planets) do
+                    love.graphics.setColor(0, .05, .1)
+                    love.graphics.circle('fill', planet.x, planet.y,planetStages[planet.stage].radius * 1.1)
+                    love.graphics.setColor(0, .2, .3)
+                    love.graphics.circle('fill', planet.x, planet.y,planetStages[planet.stage].radius)
+                    love.graphics.setColor(0.0, .3, .5)
+                    love.graphics.printf("LVL " .. planet.level, planet.x - planetStages[planet.stage].radius, planet.y, 128, 'center')
+                end
 
-            if playerLandingOnPlanet then
-                love.graphics.setColor(1.0, 1, 1)
+                if playerLandingOnPlanet then
+                    love.graphics.setColor(1.0, 1, 1)
+                    love.graphics.setFont(landingFont)
+                    love.graphics.printf("LANDING: " .. math.floor((landingTimeCurrent / (landingTime * difficultyScaler)) * 10)/10, shipX - 64, shipY + 16, 128, 'center')
+                end
+
+                love.graphics.setColor(1, 1, 0)
+                for i, pickup in ipairs(pickups) do
+                    love.graphics.circle('fill', pickup.x, pickup.y, pickupRadius)
+                end
+
+                if spawnedPowerUp then
+                    love.graphics.setFont(pixelFont)
+                    love.graphics.print("?", spawnedPowerUp.x - 8, spawnedPowerUp.y - 8)
+                end
+
+
+
+                if reaperMob then
+                    love.graphics.draw(reaperMobSprite, reaperMob.x - 64 + love.math.random(-2,2), reaperMob.y - 64 + love.math.random(-2,2))
+                end
+
+                for asteroidIndex, asteroid in ipairs(asteroids) do
+                    love.graphics.setColor(0.5, 0, 0) 
+                    love.graphics.circle('fill', asteroid.x, asteroid.y,asteroidStages[asteroid.stage].radius)
+                    love.graphics.setColor(0, 0, 0)
+                    love.graphics.setFont(landingFont)
+                    love.graphics.print(math.ceil(asteroid.hp), asteroid.x - asteroidStages[asteroid.stage].radius * 0.5, asteroid.y - asteroidStages[asteroid.stage].radius * 0.5)
+                end
+
+                love.graphics.setColor(1, 1, 1)
+                for bulletIndex, bullet in ipairs(bullets) do
+                    love.graphics.circle('fill', bullet.x, bullet.y, bulletRadius)
+                end
+
+                love.graphics.setColor(1, 0, 0)
+                for i, asteroid in ipairs(targetedAsteroids) do
+                    love.graphics.circle('line', asteroid.x , asteroid.y, asteroidStages[asteroid.stage].radius*1.2)
+                end
+                
+                if touchmove and targetX and targetY then
+                    love.graphics.setColor(1, 1, 1)
+                    love.graphics.circle("fill", targetX, targetY, 5)
+                    if #targetedAsteroids > 0 then
+                        love.graphics.setColor(1,0,0)
+                    else
+                        love.graphics.setColor(1,1,1)
+                    end
+                    love.graphics.line(shipX, shipY, targetX, targetY)
+                end
+
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.circle('fill', shipX, shipY, shipRadius)
+    
+                local shipCircleDistance = 15
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.circle('fill',shipX + math.cos(shipAngle) * shipCircleDistance,shipY + math.sin(shipAngle) * shipCircleDistance,5)
+    
+                love.graphics.setColor(1, 0, 0)
                 love.graphics.setFont(landingFont)
-                love.graphics.printf("LANDING: " .. math.floor((landingTimeCurrent / (landingTime * difficultyScaler)) * 10)/10, shipX - 64, shipY + 16, 128, 'center')
-            end
-
-            love.graphics.setColor(1, 1, 0)
-            for i, pickup in ipairs(pickups) do
-                love.graphics.circle('fill', pickup.x, pickup.y, pickupRadius)
-            end
-
-            if spawnedPowerUp then
-                love.graphics.setFont(pixelFont)
-                love.graphics.print("?", spawnedPowerUp.x - 8, spawnedPowerUp.y - 8)
-            end
-
-
-
-            if reaperMob then
-                love.graphics.draw(reaperMobSprite, reaperMob.x - 64 + love.math.random(-2,2), reaperMob.y - 64 + love.math.random(-2,2))
-            end
-
-            for asteroidIndex, asteroid in ipairs(asteroids) do
-                love.graphics.setColor(0.5, 0, 0) 
-                love.graphics.circle('fill', asteroid.x, asteroid.y,asteroidStages[asteroid.stage].radius)
-                love.graphics.setColor(0, 0, 0)
-                love.graphics.setFont(landingFont)
-                love.graphics.print(math.ceil(asteroid.hp), asteroid.x - asteroidStages[asteroid.stage].radius * 0.5, asteroid.y - asteroidStages[asteroid.stage].radius * 0.5)
-            end
-
-            love.graphics.setColor(1, 1, 1)
-            for bulletIndex, bullet in ipairs(bullets) do
-                love.graphics.circle('fill', bullet.x, bullet.y, bulletRadius)
-            end
-
-            love.graphics.setColor(1, 0, 0)
-            for i, asteroid in ipairs(targetedAsteroids) do
-                love.graphics.circle('line', asteroid.x , asteroid.y, asteroidStages[asteroid.stage].radius*1.2)
+                love.graphics.print(playerHpCurrent, shipX - shipRadius/2, shipY - shipRadius)
+    
             end
             -- FPS
             --love.graphics.print(love.timer.getFPS(), 800, 50)
@@ -77,28 +103,6 @@ function renderGame()
             -- love.graphics.setFont(textFont)
             love.graphics.print(math.ceil(gameTimer * 100) / 100, 5, 20)
 
-            if touchmove and targetX and targetY then
-                love.graphics.setColor(1, 1, 1)
-                love.graphics.circle("fill", targetX, targetY, 5)
-                if #targetedAsteroids > 0 then
-                    love.graphics.setColor(1,0,0)
-                else
-                    love.graphics.setColor(1,1,1)
-                end
-                love.graphics.line(shipX, shipY, targetX, targetY)
-            end
-
-
-            love.graphics.setColor(1, 1, 1)
-            love.graphics.circle('fill', shipX, shipY, shipRadius)
-
-            local shipCircleDistance = 15
-            love.graphics.setColor(1, 1, 1)
-            love.graphics.circle('fill',shipX + math.cos(shipAngle) * shipCircleDistance,shipY + math.sin(shipAngle) * shipCircleDistance,5)
-
-            love.graphics.setColor(1, 0, 0)
-            love.graphics.setFont(landingFont)
-            love.graphics.print(playerHpCurrent, shipX - shipRadius/2, shipY - shipRadius)
 
             drawDamageEffects()
             
@@ -106,7 +110,6 @@ function renderGame()
                 vignetteShaderStart()
                 drawVignette()
             end
-
             textShaderStart()
             drawTextBox()
         end

@@ -26,7 +26,9 @@ local textShader = love.graphics.newShader[[
                 sum += Texel(tex, tc + offset);
             }
         }
-        return ((sum / (samples * samples)) + source) * colour;
+        vec4 result = ((sum / (samples * samples)) + source) * colour;
+        result.a = floor(result.a);
+        return result;
     }
         
     

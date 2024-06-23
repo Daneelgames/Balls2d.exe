@@ -185,13 +185,15 @@ function drawTextBox()
         return
     end
 
-    love.graphics.setColor(0., 0, 0.05, 0.5)
+    love.graphics.setColor(0., 0, 0.05, 0.1)
     love.graphics.rectangle("fill", -50, -50 , love.graphics.getWidth() + 100, love.graphics.getHeight() + 100)
 
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.draw(portraitSprite, love.graphics.getWidth() * 0.5 - 80, love.graphics.getHeight() * 0.5 - 200, 0, 1.2, 1.2)
     love.graphics.setFont(pixelFont)
     
     love.graphics.setColor(1, 0, 0)
-    love.graphics.print("HP: "..playerHpCurrent, love.graphics.getWidth() * 0.5, love.graphics.getHeight() * 0.2)
+    love.graphics.print("HP: "..playerHpCurrent, love.graphics.getWidth() * 0.8, love.graphics.getHeight() * 0.1)
 
     
     love.graphics.setColor(1, 1, 0)
@@ -211,7 +213,7 @@ function drawTextBox()
     end
     love.graphics.setColor(textBox.colorR, textBox.colorG, textBox.colorB, 1)
 
-    love.graphics.printf(resultText, textBox.x, textBox.y, love.graphics.getWidth()-30, 'center')
+    love.graphics.printf(resultText, love.graphics.getWidth()  + 15, love.graphics.getHeight() * 0.5, love.graphics.getWidth()-30, 'center')
 
     love.graphics.setColor(1,1,1)
 
