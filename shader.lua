@@ -94,21 +94,40 @@ backgroundShader:send("scale", 2)
 
 local vignetteShader = love.graphics.newShader[[
 
-    uniform float alpha = 1.0;
-    uniform float inner_radius = 0.0;
-    uniform float outer_radius = 1.0;
-    uniform vec2 u_resolution;
-
+    uniform vec2 res;
+    uniform vec2 ship;
+ 
     vec4 effect(vec4 colour, Image tex, vec2 tc, vec2 sc)
     {
-        vec2 st = (2. * sc-  u_resolution.xy) / u_resolution.y;
-        vec2 uv = sc.xy / u_resolution.xy;
-        uv *=  1.0 - uv.yx;
-        float vig = uv.x*uv.y * 15.0;
-        vig = pow(vig, 0.25);
-
-        return vec4(0, 0, 0, 1-vig);
+        return vec4(0,0,0,1-(
+        max(
+            max(
+                max(
+                    max(
+                        (1-distance(sc, ship)/res*2),
+                        (1-distance(sc, vec2(ship.x+res.x,ship.y))/res*2)
+                    ),
+                    max(
+                        (1-distance(sc, vec2(ship.x-res.x,ship.y))/res*2),
+                        (1-distance(sc, vec2(ship.x,ship.y+res.y))/res*2)
+                    )
+                ),
+                max(
+                    max(
+                        (1-distance(sc, vec2(ship.x,ship.y-res.y))/res*2),
+                        (1-distance(sc, ship+res)/res*2)
+                    ),
+                    max(
+                        (1-distance(sc, ship-res)/res*2),
+                        (1-distance(sc, vec2(ship.x+res.x,ship.y-res.y))/res*2)
+                    )
+                )
+            ),
+            (1-distance(sc, vec2(ship.x-res.x,ship.y+res.y))/res*2)
+        )
+        ));
     }
+
 ]]
 
 tt = 0
@@ -123,7 +142,8 @@ function updateShader(dt)
     local w = love.graphics.getWidth()
     local h = love.graphics.getHeight()
     backgroundShader:send("u_resolution", {w, h})
-    vignetteShader:send("u_resolution", {w, h})
+    vignetteShader:send("res", {w, h})
+	vignetteShader:send("ship", {shipX, shipY})
     t = love.math.random(0.1,2.0)
     textShader:send("t", t)
     tt = tt + 40 * dt
