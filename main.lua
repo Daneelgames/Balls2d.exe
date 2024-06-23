@@ -288,7 +288,7 @@ function love.update(dt)
     end
 
     -- REAPER MOB
-    if reaperMob then
+    if reaperMob ~= nil then
         
         local dx, dy = directionTo(shipX, shipY, reaperMob.x, reaperMob.y)
         if gameTimer > 200 then

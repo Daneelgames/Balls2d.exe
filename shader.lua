@@ -112,6 +112,12 @@ local vignetteShader = love.graphics.newShader[[
 tt = 0
 ttt = 0
 function updateShader(dt)
+    if gameTimer < 100 then
+        backgroundShader:send("stage", 1)
+    else
+        backgroundShader:send("stage", 2)
+    end
+    
     local w = love.graphics.getWidth()
     local h = love.graphics.getHeight()
     backgroundShader:send("u_resolution", {w, h})
@@ -123,11 +129,6 @@ function updateShader(dt)
     textShader:send("phase", tt)
     backgroundShader:send("phase", ttt)
     textShader:send("imageSize" , {w, h})
-    
-
-    backgroundShader:send("stage", math.floor(clamp(gameTimer / 100, 1,3)))
-    -- backgroundShader:send("stage", 2)
-
 end
 
 function textShaderStart()
