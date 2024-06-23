@@ -331,7 +331,7 @@ cutscenes["bodyGrabsWhileCrawlingBackIntoVentCutscene"] = bodyGrabsWhileCrawling
 finalCryCutscene = {}
 newGamePhrase("you cried your final cry", finalCryCutscene)
 newGamePhrase("cadaver rumbles: THANK YOU", finalCryCutscene)
-newGamePhrase("THANK YOU FOR PLAYING Balls2D.exe by MRPINK GAMES", finalCryCutscene)
+newGamePhrase("THANK YOU FOR PLAYING Balls2D.exe by Pink The Meat Man and Flagrantior", finalCryCutscene)
 newPlayerChoice("wtf???", finalCryCutscene, "exitCutscene")
 
 cutscenes["finalCryCutscene"] = finalCryCutscene
